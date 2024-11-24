@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using System.Diagnostics;
-using System.Net.Http.Headers;
-using System.Net.WebSockets;
-using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
 namespace ContractsWatcher.Services;

@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-
-namespace ContractsWatcher.Services;
+﻿namespace ContractsWatcher.Services;
 
 /// <summary>
 /// The service used to provide the application addresses

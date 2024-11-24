@@ -1,12 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.Extensions.Options;
-using System;
-using System.Diagnostics;
-using System.Net.WebSockets;
-using System.Reflection;
-
-namespace ContractsWatcher.Services;
+﻿namespace ContractsWatcher.Services;
 
 /// <summary>
 /// The background service used to manage the application view window

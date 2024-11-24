@@ -1,3 +1,13 @@
 ﻿global using ContractsWatcher.Hubs;
 global using ContractsWatcher.Models;
 global using ContractsWatcher.Services;
+global using Microsoft.AspNetCore.Hosting.Server;
+global using Microsoft.AspNetCore.Hosting.Server.Features;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Options;
+global using System.Diagnostics;
+global using System.IO;
+global using System.Net.WebSockets;
+global using System.Reflection;
