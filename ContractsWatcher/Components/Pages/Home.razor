@@ -21,7 +21,7 @@
     protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri("/contracts-hub"))
+            .WithUrl(Navigation.ToAbsoluteUri("/hubs/contracts"))
             .Build();
 
         hubConnection.On<string>("NewContract", (contract) =>

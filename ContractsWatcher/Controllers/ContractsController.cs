@@ -9,7 +9,7 @@ namespace ContractsWatcher.Controllers;
 /// <param name="logger">The service used to log messages.</param>
 /// <param name="hubContext">The <see cref="IHubContext{THub}"/> used for contracts.</param>
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ContractsController(
     ILogger<ContractsController> logger,
     IHubContext<ContractsHub> hubContext

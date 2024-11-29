@@ -34,7 +34,7 @@ public static class ContractsWatcherCollectionExtensions
             .AddSingleton<AddressesProvider>()
             .AddScoped<RemoteDebugger>()
             .AddHostedService<DiscordLauncher>()
-            .AddHostedService<BrowserManager>()
+            //.AddHostedService<BrowserManager>()
             ;
         return services;
     }

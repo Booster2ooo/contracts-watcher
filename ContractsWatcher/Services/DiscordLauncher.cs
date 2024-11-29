@@ -26,6 +26,7 @@ public class DiscordLauncher(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("DiscordLauncher starting...");
+
         logger.LogTrace("Shutting down existing Discord instances.");
         var clearProcess = Process.Start(new ProcessStartInfo()
         {
@@ -34,6 +35,7 @@ public class DiscordLauncher(
             Arguments = "/f /im Discord.exe"
         }) ?? throw new Exception("Unable to kill existing Discord processes");
         await clearProcess.WaitForExitAsync(stoppingToken);
+
         logger.LogTrace("Starting Discord launcher.");
         var launcherProcess = Process.Start(new ProcessStartInfo()
         {
@@ -42,7 +44,8 @@ public class DiscordLauncher(
             UseShellExecute = false
         }) ?? throw new Exception("Unable to start Discord process");
         await launcherProcess.WaitForExitAsync(stoppingToken);
-        await Task.Delay(300, stoppingToken);
+        await Task.Delay(3000, stoppingToken);
+
         logger.LogTrace("Building injection payload.");
         var scriptPath = Environment.ExpandEnvironmentVariables(options.Value.JavaScriptPayload.Replace("%CWD%", AppDomain.CurrentDomain.BaseDirectory));
         var serverAddress = (await addressesProvider.GetPreferredAddress("http://")).Replace("localhost", "127.0.0.1");
@@ -61,13 +64,19 @@ public class DiscordLauncher(
             }
         };
         byte[] payload = JsonSerializer.SerializeToUtf8Bytes(command);
+
+        logger.LogTrace("Injecting script");
         using var scope = serviceProvider.CreateScope();
         var remoteDebugger = scope.ServiceProvider.GetRequiredService<RemoteDebugger>();
-        var wsClient = await remoteDebugger.GetWebSocketDebugger(options.Value.DebuggerPort, stoppingToken);
-        logger.LogTrace("Injecting script");
-        await wsClient.SendAsync(new ArraySegment<byte>(payload), WebSocketMessageType.Text, true, stoppingToken);
-        //wsClient.Close();?
-        wsClient.Dispose();
+        var wsClients = await remoteDebugger.GetWebSocketDebuggers(options.Value.DebuggerPort, stoppingToken);
+        await Task.Delay(1000, stoppingToken);
+        foreach(var wsClient in wsClients)
+        {
+            await wsClient.SendAsync(new ArraySegment<byte>(payload), WebSocketMessageType.Text, true, stoppingToken);
+            //wsClient.Close();?
+            wsClient.Dispose();
+        }
+
         logger.LogInformation("DiscordLauncher completed.");
     }
 }

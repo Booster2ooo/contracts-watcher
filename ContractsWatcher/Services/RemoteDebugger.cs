@@ -21,7 +21,7 @@ public class RemoteDebugger(
     /// <param name="debuggerPort">The port of the debugger to connect to.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/></param>
     /// <returns>A <see cref="ClientWebSocket"/> connected to the remote debugger.</returns>
-    public async Task<ClientWebSocket> GetWebSocketDebugger(int debuggerPort, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ClientWebSocket>> GetWebSocketDebuggers(int debuggerPort, CancellationToken cancellationToken)
     {
         logger.LogInformation("Getting debugger on port {debuggerPort}", debuggerPort);
         var httpClient = httpClientFactory.CreateClient();
@@ -32,8 +32,13 @@ public class RemoteDebugger(
         var sessions = await JsonSerializer.DeserializeAsync<List<ChromeSessionInfo>>(stream, cancellationToken: cancellationToken);
         sessions ??= [];
         httpClient.Dispose();
-        var wsClient = new ClientWebSocket();
-        await wsClient.ConnectAsync(new Uri(sessions.First().WebSocketDebuggerUrl), cancellationToken);
-        return wsClient;
+        var clients = new List<ClientWebSocket>();
+        foreach (var session in sessions)
+        {
+            var wsClient = new ClientWebSocket();
+            await wsClient.ConnectAsync(new Uri(session.WebSocketDebuggerUrl), cancellationToken);
+            clients.Add(wsClient);
+        }
+        return clients.AsEnumerable();
     }
 }
