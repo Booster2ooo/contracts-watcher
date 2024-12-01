@@ -72,7 +72,8 @@ try
     {
         AlwaysOnTop = true,
         Transparent = true,
-        Frame = false
+        Frame = false,
+        AutoHideMenuBar = true
     }); ;
 }
 catch { }

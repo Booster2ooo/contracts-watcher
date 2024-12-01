@@ -68,14 +68,11 @@ public class DiscordLauncher(
         logger.LogTrace("Injecting script");
         using var scope = serviceProvider.CreateScope();
         var remoteDebugger = scope.ServiceProvider.GetRequiredService<RemoteDebugger>();
-        var wsClients = await remoteDebugger.GetWebSocketDebuggers(options.Value.DebuggerPort, stoppingToken);
-        await Task.Delay(1000, stoppingToken);
-        foreach(var wsClient in wsClients)
-        {
-            await wsClient.SendAsync(new ArraySegment<byte>(payload), WebSocketMessageType.Text, true, stoppingToken);
-            //wsClient.Close();?
-            wsClient.Dispose();
-        }
+        var wsClient = await remoteDebugger.GetWebSocketDebuggers(options.Value.DebuggerPort, stoppingToken);
+        await wsClient.SendAsync(new ArraySegment<byte>(payload), WebSocketMessageType.Text, true, stoppingToken);
+        await wsClient.CloseAsync(WebSocketCloseStatus.NormalClosure, null, stoppingToken);
+        wsClient.Dispose();
+
 
         logger.LogInformation("DiscordLauncher completed.");
     }

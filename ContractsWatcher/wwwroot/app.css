@@ -4,6 +4,11 @@ html, body {
     color: white;
 }
 
+/* drag the window when dragging the sidebar*/
+.sidebar {
+    -webkit-app-region: drag;
+}
+
 a, .btn-link {
     color: #006bb7;
 }
@@ -44,9 +49,9 @@ h1:focus {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;

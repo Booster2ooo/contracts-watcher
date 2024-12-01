@@ -21,24 +21,36 @@ public class RemoteDebugger(
     /// <param name="debuggerPort">The port of the debugger to connect to.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/></param>
     /// <returns>A <see cref="ClientWebSocket"/> connected to the remote debugger.</returns>
-    public async Task<IEnumerable<ClientWebSocket>> GetWebSocketDebuggers(int debuggerPort, CancellationToken cancellationToken)
+    public async Task<ClientWebSocket> GetWebSocketDebuggers(int debuggerPort, CancellationToken cancellationToken)
     {
         logger.LogInformation("Getting debugger on port {debuggerPort}", debuggerPort);
         var httpClient = httpClientFactory.CreateClient();
         httpClient.DefaultRequestHeaders.Accept.Clear();
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         httpClient.DefaultRequestHeaders.Add("User-Agent", Assembly.GetExecutingAssembly().GetName().Name);
-        await using Stream stream = await httpClient.GetStreamAsync($"http://localhost:{debuggerPort}/json", cancellationToken);
-        var sessions = await JsonSerializer.DeserializeAsync<List<ChromeSessionInfo>>(stream, cancellationToken: cancellationToken);
-        sessions ??= [];
-        httpClient.Dispose();
-        var clients = new List<ClientWebSocket>();
-        foreach (var session in sessions)
-        {
-            var wsClient = new ClientWebSocket();
-            await wsClient.ConnectAsync(new Uri(session.WebSocketDebuggerUrl), cancellationToken);
-            clients.Add(wsClient);
+        ChromeSessionInfo? session = null;
+        do { 
+            await using Stream stream = await httpClient.GetStreamAsync($"http://localhost:{debuggerPort}/json", cancellationToken);
+            var sessions = await JsonSerializer.DeserializeAsync<List<ChromeSessionInfo>>(stream, cancellationToken: cancellationToken);
+            sessions ??= [];
+            session = sessions.FirstOrDefault(s => s.Url == "https://discord.com/channels/@me");
         }
-        return clients.AsEnumerable();
+        while (session == null);
+        httpClient.Dispose();
+        var wsClient = new ClientWebSocket();
+        Exception? ex = null;
+        do
+        {
+            try
+            {
+                await wsClient.ConnectAsync(new Uri(session!.WebSocketDebuggerUrl), cancellationToken);
+            }
+            catch (Exception innerEx) {
+                ex = innerEx;
+                await Task.Delay(500, cancellationToken);
+            }
+        }
+        while (ex != null);
+        return wsClient;
     }
 }
