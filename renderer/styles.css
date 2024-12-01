@@ -1,0 +1,28 @@
+*, *::before, *::after{
+  box-sizing: border-box; 
+}
+
+*{
+  margin: 0; 
+  padding: 0; 
+}
+
+/* if it's required to let the user select its theme: https://www.electronjs.org/docs/latest/tutorial/dark-mode */
+@media (prefers-color-scheme: dark) {
+  body { color: white; }
+}
+
+@media (prefers-color-scheme: light) {
+  body { color: black; }
+}
+
+html, body {
+  background-color: transparent;
+}
+
+nav {
+  -webkit-app-region: drag;
+  width: 100%;
+  height: 10px;
+  background-color: rgba(125, 125, 125, 0.3);
+}
